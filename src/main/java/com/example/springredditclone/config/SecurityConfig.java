@@ -28,6 +28,7 @@ import java.util.Arrays;
 @EnableWebSecurity
 @AllArgsConstructor
 
+
 public class  SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -42,13 +43,20 @@ public class  SecurityConfig extends WebSecurityConfigurerAdapter {
                 cors().and().csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/**").permitAll()
+
                 .antMatchers("/login").hasRole("ADMIN")
                 .antMatchers("/Signup").hasRole("USER")
+
                 .and();//add rest of your configurations
+        http.addFilterBefore(jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class);
+
+
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200")); //or add * to allow all origins
         configuration.setAllowCredentials(true);
@@ -58,6 +66,7 @@ public class  SecurityConfig extends WebSecurityConfigurerAdapter {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
+
     }
 
     @Autowired
